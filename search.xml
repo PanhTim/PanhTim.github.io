@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>JAVA8 Lambda表达式</title>
+    <url>/2020/01/13/java8Lambda/</url>
+    <content><![CDATA[<h1 id="JAVA8-Lambda表达式"><a href="#JAVA8-Lambda表达式" class="headerlink" title="JAVA8 Lambda表达式"></a>JAVA8 Lambda表达式</h1><p>​        在看很多源码的时候，都能看到coder们都用上了Lambda表达式。对于Lambda表达式的，我的第一个疑问就是Lambda是拿来干嘛的。有疑问第一反应就是找度娘。度娘出来的大部分结果都是直接介绍Lambda的用法，最后在官网中找到了官方说明：</p>
+<blockquote>
+<p>One issue with anonymous classes is that if the implementation of your anonymous class is very simple, such as an interface that contains only one method, then the syntax of anonymous classes may seem unwieldy and unclear. In these cases, you’re usually trying to pass functionality as an argument to another method, such as what action should be taken when someone clicks a button. Lambda expressions enable you to do this, to treat functionality as method argument, or code as data.</p>
+</blockquote>
+<p>简单来说就是为了代码写起来更加简洁，能很简洁的实现简单的匿名内部类。</p>
+<h2 id="Lambda表达式语法"><a href="#Lambda表达式语法" class="headerlink" title="Lambda表达式语法"></a>Lambda表达式语法</h2><p>​        Lambda表达式的语法包含三个部分：parameters，-&gt;，body。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">(parameters) -&gt; expression;</span><br><span class="line">或</span><br><span class="line">(parameters) -&gt; &#123; statements; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>以下是lambda表达式的重要特征:</p>
+<ul>
+<li>可选类型声明：不需要声明参数类型，编译器可以统一识别参数值。</li>
+<li>可选的参数圆括号：一个参数无需定义圆括号，但多个参数需要定义圆括号。</li>
+<li>可选的大括号：如果主体包含了一个语句，就不需要使用大括号。</li>
+<li>可选的返回关键字：如果主体只有一个表达式返回值则编译器会自动返回值，大括号需要指定明表达式返回了一个数值。</li>
+</ul>
+<h2 id="Lambda表达式实例"><a href="#Lambda表达式实例" class="headerlink" title="Lambda表达式实例"></a>Lambda表达式实例</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1. 不需要参数,返回值为 5  </span></span><br><span class="line">() -&gt; <span class="number">5</span> </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 2. 接收一个参数(数字类型),返回其2倍的值  </span></span><br><span class="line">x -&gt; <span class="number">2</span> * x  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 3. 接受2个参数(数字),并返回他们的差值  </span></span><br><span class="line">(x, y) -&gt; x – y </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 4. 接收2个int型整数,返回他们的和  </span></span><br><span class="line">(<span class="keyword">int</span> x, <span class="keyword">int</span> y) -&gt; x + y  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 5. 接受一个 string 对象,并在控制台打印,不返回任何值(看起来像是返回void)  </span></span><br><span class="line">(String s) -&gt; System.out.print(s)</span><br><span class="line">  </span><br><span class="line"><span class="comment">// 6. 接受两个string 对象，并在控制台打印，返回两个string的拼接结果</span></span><br><span class="line">(String a, String b) -&gt; &#123;</span><br><span class="line">  System.out.print(a);</span><br><span class="line">  System.out.print(b);</span><br><span class="line">  <span class="keyword">return</span> a.concat(b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体的实例可以直接看Java官网提供的实例</p>
+<p>首先创建了一个Person类，所有的Person实例都存放在List<Person> roster 中。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> Sex &#123;</span><br><span class="line">        MALE, FEMALE</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    String name;</span><br><span class="line">    LocalDate birthday;</span><br><span class="line">    Sex gender;</span><br><span class="line">    String emailAddress;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printPerson</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后创建一个方法，可以根据不同的判断条件打印符合条件的Person</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printPersons</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    List&lt;Person&gt; roster, CheckPerson tester)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (Person p : roster) &#123;</span><br><span class="line">        <span class="keyword">if</span> (tester.test(p)) &#123;</span><br><span class="line">            p.printPerson();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于支持不用的判断条件，所以将判断条件写成一个接口，自行实现接口就可以实现不用的判断条件。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">CheckPerson</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Person p)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JAVA8之前的实现如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//创建一个类去实现判断逻辑</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CheckPersonEligibleForSelectiveService</span> <span class="keyword">implements</span> <span class="title">CheckPerson</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Person p)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> p.gender == Person.Sex.MALE &amp;&amp;</span><br><span class="line">            p.getAge() &gt;= <span class="number">18</span> &amp;&amp;</span><br><span class="line">            p.getAge() &lt;= <span class="number">25</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//新建实例作为参数传入printPersons</span></span><br><span class="line">printPersons(roster, <span class="keyword">new</span> CheckPersonEligibleForSelectiveService());</span><br></pre></td></tr></table></figure>
+
+<p>JAVA8使用Lambda的实现如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">printPersons(</span><br><span class="line">    roster,</span><br><span class="line">    (Person p) -&gt; p.getGender() == Person.Sex.MALE</span><br><span class="line">        &amp;&amp; p.getAge() &gt;= <span class="number">18</span></span><br><span class="line">        &amp;&amp; p.getAge() &lt;= <span class="number">25</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>官网的实例完整源码可查看：</p>
+<h2 id="函数式接口"><a href="#函数式接口" class="headerlink" title="函数式接口"></a>函数式接口</h2><p>Java8中新增了很多函数式接口，了解下，可以使得我们的代码更加简洁，也可以减少重复开发。这里就不详细介绍了，感觉每个接口都能单独写一大篇。直接到以下链接中了解下吧~</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.runoob.com/java/java8-lambda-expressions.html" target="_blank" rel="noopener">Java 8 Lambda 表达式</a></p>
+<p><a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html#approach1" target="_blank" rel="noopener">Lambda Expressions</a></p>
+]]></content>
+      <tags>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Guava 14.0.1编译异常记录</title>
     <url>/2020/01/09/guava/</url>
     <content><![CDATA[<p>​        由于<del>自己作</del>项目需要，同时使用了<a href="https://github.com/justinsb/jetcd" target="_blank" rel="noopener">justinsb.jetcd</a>的客户端（使用的是guava14.0.1）以及mapdb（使用的是guava28.2-jre），导致guava包冲突。guava这两个版本的差异非常大，强制使用任意一版本都会导致另一个包不能使用。由于jetcd的源码相对简单很多，所以决定修改guava14.0.1的包路径。（因为不知道还有什么解决方案所以只能用这么挫的方法了）</p>
