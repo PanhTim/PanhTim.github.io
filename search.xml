@@ -37,7 +37,9 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">printPersons(</span><br><span class="line">    roster,</span><br><span class="line">    (Person p) -&gt; p.getGender() == Person.Sex.MALE</span><br><span class="line">        &amp;&amp; p.getAge() &gt;= <span class="number">18</span></span><br><span class="line">        &amp;&amp; p.getAge() &lt;= <span class="number">25</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 
 <p>官网的实例完整源码可查看：</p>
+<p><a href="https://docs.oracle.com/javase/tutorial/java/javaOO/examples/RosterTest.java" target="_blank" rel="noopener">实例完整源码</a></p>
 <h2 id="函数式接口"><a href="#函数式接口" class="headerlink" title="函数式接口"></a>函数式接口</h2><p>Java8中新增了很多函数式接口，了解下，可以使得我们的代码更加简洁，也可以减少重复开发。这里就不详细介绍了，感觉每个接口都能单独写一大篇。直接到以下链接中了解下吧~</p>
+<p><a href="https://www.runoob.com/java/java8-functional-interfaces.html" target="_blank" rel="noopener">Java8函数式接口</a></p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.runoob.com/java/java8-lambda-expressions.html" target="_blank" rel="noopener">Java 8 Lambda 表达式</a></p>
 <p><a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html#approach1" target="_blank" rel="noopener">Lambda Expressions</a></p>
 ]]></content>
