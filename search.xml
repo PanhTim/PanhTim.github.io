@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>BlockingQueue各实现类简介</title>
-    <url>/2020/01/15/BlockingQueue%E5%90%84%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%AE%80%E4%BB%8B/</url>
+    <url>/2020/01/15/BlockingQueue/</url>
     <content><![CDATA[<h1 id="BlockingQueue各实现类简介"><a href="#BlockingQueue各实现类简介" class="headerlink" title="BlockingQueue各实现类简介"></a>BlockingQueue各实现类简介</h1><p>​        BlockingQueue就是定义了一种阻塞队列。BlockingQueue中定义了以下的方法：</p>
 <table>
 <thead>
