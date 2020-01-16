@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>BlockingQueue各实现类简介</title>
-    <url>/2020/01/15/BlockingQueue/</url>
+    <url>/2020/01/15/BlockingQueue%E5%90%84%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%AE%80%E4%BB%8B/</url>
     <content><![CDATA[<h1 id="BlockingQueue各实现类简介"><a href="#BlockingQueue各实现类简介" class="headerlink" title="BlockingQueue各实现类简介"></a>BlockingQueue各实现类简介</h1><p>​        BlockingQueue就是定义了一种阻塞队列。BlockingQueue中定义了以下的方法：</p>
 <table>
 <thead>
@@ -90,7 +90,7 @@
 </li>
 </ol>
 <p>​        具体的读写逻辑就先不看了，有机会的话一个一个Queue的源码慢慢看，这里先看个读写的示意图，不过貌似没有transfer的操作说明。</p>
-<p><img src="BlockingQueue/LinkedTransferQueue.png" alt="LinkedTransferQueue"></p>
+<p><img src="/.com//LinkedTransferQueue.png" alt="LinkedTransferQueue"></p>
 <p>​        LinkedTransferQueue与其他的BlockingQueue不一样，它没有使用ReentrantLock对读写等操作上锁。这个队列的读写原理以及阻塞原理需要仔细看源码才行，有空再看。</p>
 <p>size无lock，读写貌似均无锁？</p>
 <h2 id="PriorityBlockingQueue"><a href="#PriorityBlockingQueue" class="headerlink" title="PriorityBlockingQueue"></a>PriorityBlockingQueue</h2><p>​        PriorityBlockingQueue与ArrayBlockingQueue一样，内部都是用数组对对象进行存储，在初始化时都可以选择性的指定容量大小，不指定容量时默认使用Integer.MAX_VALUE($2^31$-1)。不同之处在于，PriorityBlockingQueue中的元素存放是有序的，并且当达到容量上限时会自动扩容。扩容规则如下：</p>
@@ -103,7 +103,8 @@
 <p>​        该队列的size方法直接返回0，并且peek方法直接返回null。该队列跟LinkedTransferQueue一样没有使用ReentrantLock。</p>
 ]]></content>
       <tags>
-        <tag>-JAVA -BlockingQueue</tag>
+        <tag>JAVA</tag>
+        <tag>BlockingQueue</tag>
       </tags>
   </entry>
   <entry>
@@ -127,7 +128,7 @@
 <h2 id="Lambda表达式实例"><a href="#Lambda表达式实例" class="headerlink" title="Lambda表达式实例"></a>Lambda表达式实例</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1. 不需要参数,返回值为 5  </span></span><br><span class="line">() -&gt; <span class="number">5</span> </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 2. 接收一个参数(数字类型),返回其2倍的值  </span></span><br><span class="line">x -&gt; <span class="number">2</span> * x  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 3. 接受2个参数(数字),并返回他们的差值  </span></span><br><span class="line">(x, y) -&gt; x – y </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 4. 接收2个int型整数,返回他们的和  </span></span><br><span class="line">(<span class="keyword">int</span> x, <span class="keyword">int</span> y) -&gt; x + y  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 5. 接受一个 string 对象,并在控制台打印,不返回任何值(看起来像是返回void)  </span></span><br><span class="line">(String s) -&gt; System.out.print(s)</span><br><span class="line">  </span><br><span class="line"><span class="comment">// 6. 接受两个string 对象，并在控制台打印，返回两个string的拼接结果</span></span><br><span class="line">(String a, String b) -&gt; &#123;</span><br><span class="line">  System.out.print(a);</span><br><span class="line">  System.out.print(b);</span><br><span class="line">  <span class="keyword">return</span> a.concat(b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>具体的实例可以直接看Java官网提供的实例</p>
-<p>首先创建了一个Person类，所有的Person实例都存放在List<Person> roster 中。</p>
+<p>首先创建了一个Person类，所有的Person实例都存放在List<Person> roster 中。</Person></p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> Sex &#123;</span><br><span class="line">        MALE, FEMALE</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    String name;</span><br><span class="line">    LocalDate birthday;</span><br><span class="line">    Sex gender;</span><br><span class="line">    String emailAddress;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printPerson</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>然后创建一个方法，可以根据不同的判断条件打印符合条件的Person</p>
@@ -176,7 +177,7 @@
     <title>Hexo＋Github pages搭建第一个博客</title>
     <url>/2016/09/15/firstpost/</url>
     <content><![CDATA[<p>  好久之前就想自己搭一个博客来玩玩了，可惜太懒一直没去弄。直到最近看到了Hexo使用hexo＋github pages搭博客不仅简单，而且还免费。我这么好(kou)学(men)的好孩子怎么能不插一脚呢！果断弄起来呀！</p>
-<h2 id="一、git"><a href="#一、git" class="headerlink" title="一、git"></a>一、git</h2><h3 id="1-1-下载安装git"><a href="#1-1-下载安装git" class="headerlink" title="1.1 下载安装git"></a>1.1 下载安装git</h3><p>git的安装可以通过下面两种方法：<br>1.去git的官网中下载<a href="https://git-scm.com/download/mac" title="" target="">Git for Mac</a><br>2.去github的官网下载<a href="https://desktop.github.com/" title="" target="">GitHub Desktop</a><br>下载完成后按照提示完成安装。</p>
+<h2 id="一、git"><a href="#一、git" class="headerlink" title="一、git"></a>一、git</h2><h3 id="1-1-下载安装git"><a href="#1-1-下载安装git" class="headerlink" title="1.1 下载安装git"></a>1.1 下载安装git</h3><p>git的安装可以通过下面两种方法：<br>1.去git的官网中下载<a href="https://git-scm.com/download/mac" title target>Git for Mac</a><br>2.去github的官网下载<a href="https://desktop.github.com/" title target>GitHub Desktop</a><br>下载完成后按照提示完成安装。</p>
 <h3 id="1-2-配置git"><a href="#1-2-配置git" class="headerlink" title="1.2 配置git"></a>1.2 配置git</h3><p>完成安装后需要进行一些配置，才能正常的使用git。</p>
 <h4 id="配置SSH-keys"><a href="#配置SSH-keys" class="headerlink" title="配置SSH keys"></a>配置SSH keys</h4><p>首先检查SSH key</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/.ssh</span><br></pre></td></tr></table></figure>
@@ -190,11 +191,11 @@
 <h4 id="添加SSH-key到GitHub"><a href="#添加SSH-key到GitHub" class="headerlink" title="添加SSH key到GitHub"></a>添加SSH key到GitHub</h4><p>在本机设置SSH Key之后，需要添加到GitHub上，以完成SSH链接的设置<br>1.拷贝key</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ clip &lt; ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
 <p>2.在GitHub右上方点击头像，选择“Settings”</p>
-<img src="/images/settings.png" class="">
+<img src="/images/settings.png" class>
 <p>3.在左侧导航中选择“SSH and GPG keys”,然后在右上角点击“New SSH key”</p>
-<img src="/images/newssh.png" class="">
+<img src="/images/newssh.png" class>
 <p>4.将第1步中拷贝出来的key粘贴到“key”中，然后点击“add ssh key”。</p>
-<img src="/images/addssh.png" class="">
+<img src="/images/addssh.png" class>
 <h4 id="设置用户名和邮箱地址"><a href="#设置用户名和邮箱地址" class="headerlink" title="设置用户名和邮箱地址"></a>设置用户名和邮箱地址</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git config --global user.name <span class="string">"username"</span></span><br><span class="line">$ git config --global user.email <span class="string">"username@example.com"</span></span><br></pre></td></tr></table></figure>
 <h3 id="1-3-测试链接"><a href="#1-3-测试链接" class="headerlink" title="1.3 测试链接"></a>1.3 测试链接</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ssh -T git@github.com</span><br></pre></td></tr></table></figure>
 <p>如果出现以下信息</p>
@@ -202,17 +203,17 @@
 <p>就键入：yes。之后就能看到如下信息：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Hi username! You<span class="string">'ve successfully authenticated, but GitHub does not</span></span><br><span class="line"><span class="string">provide shell access.</span></span><br></pre></td></tr></table></figure>
 <h2 id="二、创建github仓库"><a href="#二、创建github仓库" class="headerlink" title="二、创建github仓库"></a>二、创建github仓库</h2><h3 id="2-1-在github中创建blog的仓库"><a href="#2-1-在github中创建blog的仓库" class="headerlink" title="2.1 在github中创建blog的仓库"></a>2.1 在github中创建blog的仓库</h3><p>点击github个人主页的右上角的”new repository”创建新的仓库</p>
-<img src="/images/newrepo.png" class="">
+<img src="/images/newrepo.png" class>
 <p>在创建页面中只需要填写repository name即可，repository name的格式必须是name.github.io 。这样github pages 才能识别出来。</p>
 <h3 id="2-2-克隆本地仓库"><a href="#2-2-克隆本地仓库" class="headerlink" title="2.2 克隆本地仓库"></a>2.2 克隆本地仓库</h3><p>在github上创建好blog的仓库后可先行科隆到本地，这一步不做也没关系，因为后面的部分操作可能导致此步报废。</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> git@github.com:username/name.github.io.git</span><br></pre></td></tr></table></figure>
 
-<h2 id="三、Hexo"><a href="#三、Hexo" class="headerlink" title="三、Hexo"></a>三、Hexo</h2><p>Hexo的安装过程可以在<a href="https://hexo.io/zh-cn/docs/index.html" title="" target="">Hexo</a>的官网中找到。</p>
-<h3 id="3-1-Hexo安装前准备"><a href="#3-1-Hexo安装前准备" class="headerlink" title="3.1 Hexo安装前准备"></a>3.1 Hexo安装前准备</h3><p>安装Hexo之前需要确保机器上有npm和Nodejs。高版本的Nodejs中包含了npm，所以直接安装Nodejs即可。<br>Nodejs可直接在<a href="https://nodejs.org/en/" title="" target="">Nodejs官网</a>下载安装包，根据提示完成安装即可。</p>
+<h2 id="三、Hexo"><a href="#三、Hexo" class="headerlink" title="三、Hexo"></a>三、Hexo</h2><p>Hexo的安装过程可以在<a href="https://hexo.io/zh-cn/docs/index.html" title target>Hexo</a>的官网中找到。</p>
+<h3 id="3-1-Hexo安装前准备"><a href="#3-1-Hexo安装前准备" class="headerlink" title="3.1 Hexo安装前准备"></a>3.1 Hexo安装前准备</h3><p>安装Hexo之前需要确保机器上有npm和Nodejs。高版本的Nodejs中包含了npm，所以直接安装Nodejs即可。<br>Nodejs可直接在<a href="https://nodejs.org/en/" title target>Nodejs官网</a>下载安装包，根据提示完成安装即可。</p>
 <h3 id="3-2-Hexo安装"><a href="#3-2-Hexo安装" class="headerlink" title="3.2 Hexo安装"></a>3.2 Hexo安装</h3><p>hexo是需要在用户拥有完全控制权的目录下进行安装的，可直接在2.2中克隆出来的仓库路径下进行安装。</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sudo npm install -g hexo</span><br><span class="line">$ hexo init </span><br><span class="line">$ npm install</span><br><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
 <p>查看克隆的目录下是否还存在.git</p>
-<img src="/images/ifgit.png" class="">
+<img src="/images/ifgit.png" class>
 <p>若不存在则执行以下命令</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ git init</span><br><span class="line">$ git remote add origin git@github.com:username/name.github.io.git</span><br></pre></td></tr></table></figure>
 <p>然后就可以将hexo项目提交到github中管理</p>
@@ -225,9 +226,9 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo g</span><br><span class="line">$ hexo d</span><br></pre></td></tr></table></figure>
 <p>然后访问namme.github.io就可以看到blog了。</p>
 <h2 id="四、参考链接"><a href="#四、参考链接" class="headerlink" title="四、参考链接"></a>四、参考链接</h2><ol>
-<li><a href="http://crazymilk.github.io/2015/12/28/GitHub-Pages-Hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/" title="" target="">GitHub-Pages-Hexo搭建博客</a></li>
-<li><a href="http://theme-next.iissnan.com/getting-started.html" title="" target="">NexT主题</a></li>
-<li><a href="http://blog.csdn.net/poem_of_sunshine/article/details/29369785" title="" target="">如何搭建一个独立博客——简明Github Pages与Hexo教程</a>
+<li><a href="http://crazymilk.github.io/2015/12/28/GitHub-Pages-Hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/" title target>GitHub-Pages-Hexo搭建博客</a></li>
+<li><a href="http://theme-next.iissnan.com/getting-started.html" title target>NexT主题</a></li>
+<li><a href="http://blog.csdn.net/poem_of_sunshine/article/details/29369785" title target>如何搭建一个独立博客——简明Github Pages与Hexo教程</a>
 </li>
 </ol>
 ]]></content>
