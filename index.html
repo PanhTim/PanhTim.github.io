@@ -288,111 +288,14 @@
 <li><a href="#小结">小结</a></li>
 </ol>
 <h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h2><p>​        ArrayBlockingQueue是一个有界阻塞队列（FIFO），创建时必须指定容量大小，并且该大小无法修改。ArrayBlockingQueue的读写操作均会阻塞。当队列已满，执行写入操作时，线程将被阻塞直到队列有空余容量才会写入，或达到等待时间返回false。ArrayBlockingQueue内部使用数组来存放元素。</p>
-<p>​        ArrayBlockingQueue的读写都是使用的同一个锁，所以读写操作是互斥的。ArrayBlockingQueue的锁可以在初始化时定义使用公平锁还是非公平锁，默认使用非公平锁。非公平锁的性能相对于公平锁的性能要好一些，但并发的线程足够多时会出现“饥饿”问题。</p>
-<h2 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h2><p>​        DelayQueue是一个无界阻塞队列，并且延迟元素可获取的时间——既当元素写入DelayQueue后，需要经过一定时间才能通过Remove或Examine方法获取到。</p>
-<p>​        存入DelayQueue的元素必须实现Delayed接口。Delayed又继承了Comparable接口，所以Delayed有两个方法需要实现：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//返回该对象的剩余时间，返回值的单位由参数TimeUnit决定</span></span><br><span class="line"><span class="comment">//从DelayQueue中获取元素时，需要调用此方法判断队列中的第一个元素是否已经到期。</span></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">getDelay</span><span class="params">(TimeUnit unit)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//DelayQueue在存放时，会调用该方法进行排序，保证队列的第一个元素是最早到期的元素。</span></span><br><span class="line"><span class="comment">//所以在实现该方法时，需要注意要按照到期的剩余时间升序排序。</span></span><br><span class="line"><span class="comment">//PS：DelayQueue存放元素时，是使用了PriorityBlockingDeque，是PriorityBlockingDeque需要使用到该方法进行排序。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(T o)</span></span>;</span><br></pre></td></tr></table></figure>
-
-<p>​        DelayQueue虽然实现了offer(E e, long timeout, TimeUnit unit)，但是实际上调用的还是offer(E e)。由于DelayQueue是无界的，乐观的认为不会发生阻塞的情况。</p>
-<p>​        思考：DelayQueue使用的是非公平锁，当并发线程足够多时，应该还是会出现某些线程长时间无法获取到锁的“饥饿”问题。</p>
-<p>​        offer(E e, long timeout, TimeUnit unit)源码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Inserts the specified element into this delay queue. As the queue is</span></span><br><span class="line"><span class="comment">* unbounded this method will never block.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> e the element to add</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> timeout This parameter is ignored as the method never blocks</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> unit This parameter is ignored as the method never blocks</span></span><br><span class="line"><span class="comment">* <span class="doctag">@return</span> &#123;<span class="doctag">@code</span> true&#125;</span></span><br><span class="line"><span class="comment">* <span class="doctag">@throws</span> NullPointerException &#123;<span class="doctag">@inheritDoc</span>&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">offer</span><span class="params">(E e, <span class="keyword">long</span> timeout, TimeUnit unit)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> offer(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="LinkedBlockingDeque"><a href="#LinkedBlockingDeque" class="headerlink" title="LinkedBlockingDeque"></a>LinkedBlockingDeque</h2><p>​        LinkedBlockingDeque是双向阻塞队列，容量大小在初始化时指定，若初始化时不指定容量大小则默认容量为Integer.MAX_VALUE($2^31$-1)。内部存储元素是使用双向链表进行存储，链表的定义如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * The item, or null if this node has been removed.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    E item;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * One of:</span></span><br><span class="line"><span class="comment">    * - the real predecessor Node</span></span><br><span class="line"><span class="comment">    * - this Node, meaning the predecessor is tail</span></span><br><span class="line"><span class="comment">    * - null, meaning there is no predecessor</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    Node&lt;E&gt; prev;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * One of:</span></span><br><span class="line"><span class="comment">    * - the real successor Node</span></span><br><span class="line"><span class="comment">    * - this Node, meaning the successor is head</span></span><br><span class="line"><span class="comment">    * - null, meaning there is no successor</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    Node&lt;E&gt; next;</span><br><span class="line"></span><br><span class="line">    Node(E x) &#123;</span><br><span class="line">        item = x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>​        相比其他的阻塞队列，LinkedBlockingDeque对所有的读写方法都增加了指明读写方向的方法，如：addFirst，addLast，removeFirst，removeLast … …方法后缀带有First表示对队列的第一个元素进行操作，方法后缀带有Last的表示对队列的最后一个元素进行操作。若直接使用BlockingQueue定义的接口，则表示跟FIFO的队列一样的操作——既Insert Last，Remove or Examine First。</p>
-<p>​        LinkedBlockingDeque全局使用同一个锁对象，所以读写操作是互斥的。BlockingDeque这种双向链表实现的阻塞队列主要是用于”工作窃取算法“，以后有机会用到再详细说明。</p>
-<h2 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h2><p>​        LinkedBlockingQueue是容量大小可配的阻塞队列，当初始化不指定容量大小时，默认容量为Integer.MAX_VALUE($2^31$-1)。LinkedBlocking内部存储使用单向链表，链表的定义如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">    E item;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * One of:</span></span><br><span class="line"><span class="comment">    * - the real successor Node</span></span><br><span class="line"><span class="comment">    * - this Node, meaning the successor is head.next</span></span><br><span class="line"><span class="comment">    * - null, meaning there is no successor (this is the last node)</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    Node&lt;E&gt; next;</span><br><span class="line"></span><br><span class="line">    Node(E x) &#123; item = x; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>​        这里可以和LinkedBlockingDeque的链表定义对比着看。LinkedBlockingQueue中读写的锁是分开的，所以读写操作可以同时进行。</p>
-<h2 id="LinkedTransferQueue"><a href="#LinkedTransferQueue" class="headerlink" title="LinkedTransferQueue"></a>LinkedTransferQueue</h2><p>​        LinkedTransferQueue是FIFO的无界单向阻塞队列，内部存储使用单向链表，但是它的链表结构较为特别，有两种节点类型（数据节点与请求节点）。链表的定义如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">boolean</span> isData;   <span class="comment">// false if this is a request node</span></span><br><span class="line">      <span class="keyword">volatile</span> Object item;   <span class="comment">// initially non-null if isData; CASed to match</span></span><br><span class="line">      <span class="keyword">volatile</span> Node next;</span><br><span class="line">      <span class="keyword">volatile</span> Thread waiter; <span class="comment">// null until waiting</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">//... 中间的一些方法就先不看了，以后有机会再详细的看一下。</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">3375979862319811754L</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Unsafe mechanics</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> sun.misc.Unsafe UNSAFE;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> itemOffset;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> nextOffset;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> waiterOffset;</span><br><span class="line">      <span class="keyword">static</span> &#123;</span><br><span class="line">          <span class="keyword">try</span> &#123;</span><br><span class="line">              UNSAFE = sun.misc.Unsafe.getUnsafe();</span><br><span class="line">              Class&lt;?&gt; k = Node<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">              itemOffset = UNSAFE.objectFieldOffset</span><br><span class="line">                  (k.getDeclaredField(<span class="string">"item"</span>));</span><br><span class="line">              nextOffset = UNSAFE.objectFieldOffset</span><br><span class="line">                  (k.getDeclaredField(<span class="string">"next"</span>));</span><br><span class="line">              waiterOffset = UNSAFE.objectFieldOffset</span><br><span class="line">                  (k.getDeclaredField(<span class="string">"waiter"</span>));</span><br><span class="line">          &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">              <span class="keyword">throw</span> <span class="keyword">new</span> Error(e);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<p>​        LinkedTransferQueue相比其他的BlockingQueue主要是多了transfer和tryTransfer方法。主要是提供了以下两种操作：</p>
-<ol>
-<li><p>当队列为空或第一个节点为请求节点时，消费者的请求将会生成一个请求节点追加到队列末尾，等待生产者提写入元素</p>
-</li>
-<li><p>当生产者调用transfer接口时，若此时队列的第一个节点是请求节点，生产者将直接把元素传递给消费者，不会再写入队列中；若此时队列为空生产者将元素写入队列，并且阻塞等待消费者消费。</p>
-</li>
-</ol>
-<p>​        具体的读写逻辑就先不看了，有机会的话一个一个Queue的源码慢慢看，这里先看个读写的示意图，不过貌似没有transfer的操作说明。</p>
-<p><img src="/2020/01/15/BlockingQueue/LinkedTransferQueue.png" alt="LinkedTransferQueue"></p>
-<p>​        LinkedTransferQueue与其他的BlockingQueue不一样，它没有使用ReentrantLock对读写等操作上锁。这个队列的读写原理以及阻塞原理需要仔细看源码才行，有空再看。</p>
-<h2 id="PriorityBlockingQueue"><a href="#PriorityBlockingQueue" class="headerlink" title="PriorityBlockingQueue"></a>PriorityBlockingQueue</h2><p>​        PriorityBlockingQueue与ArrayBlockingQueue一样，内部都是用数组对对象进行存储，在初始化时都可以选择性的指定容量大小，不指定容量时默认使用Integer.MAX_VALUE($2^31$-1)。不同之处在于，PriorityBlockingQueue中的元素存放是有序的，并且当达到容量上限时会自动扩容。扩容规则如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_ARRAY_SIZE = Integer.MAX_VALUE - <span class="number">8</span>;</span><br><span class="line"><span class="keyword">int</span> newCap = oldCap + ((oldCap &lt; <span class="number">64</span>) ?</span><br><span class="line">                                       (oldCap + <span class="number">2</span>) : <span class="comment">// grow faster if small</span></span><br><span class="line">                                       (oldCap &gt;&gt; <span class="number">1</span>));</span><br><span class="line"><span class="keyword">if</span> (newCap - MAX_ARRAY_SIZE &gt; <span class="number">0</span>) &#123;    <span class="comment">// possible overflow</span></span><br><span class="line">  <span class="keyword">int</span> minCap = oldCap + <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (minCap &lt; <span class="number">0</span> || minCap &gt; MAX_ARRAY_SIZE)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> OutOfMemoryError();</span><br><span class="line">  newCap = MAX_ARRAY_SIZE;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (newCap &gt; oldCap &amp;&amp; queue == array)</span><br><span class="line">  newArray = <span class="keyword">new</span> Object[newCap];</span><br></pre></td></tr></table></figure>
-
-<p>当原队列大小小于64，则容量翻倍后再加2。若原队列大小大于64，则增加原容量的一半。中间的一段是在判断是否超出了最大容量。</p>
-<p>​        PriorityBlockingQueue初始化时允许传入Comparator，若不初始化Comparator，则存入该队列的元素必须实现Comparator的compareTo方法。</p>
-<h2 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h2><p>​        SynchronousQueue是一个无界阻塞队列。元素可以用两个数据结构来存放TransferQueue(FIFO)和TransferStack(LIFO)。Insert操作将被直接阻塞，直到被Remove操作取走元素或达到超时时间。Remove操作也是直接阻塞，直到有Insert操作取走Insert的元素或达到超时时间。</p>
-<p>​        该队列的size方法直接返回0，并且peek方法直接返回null。该队列跟LinkedTransferQueue一样没有使用ReentrantLock。</p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>​        在LinkedTransferQueue中有这么一段描述：</p>
-<blockquote>
-<p>Beware that, unlike in most collections, the size method is NOT a constant-time operation. Because of the asynchronous nature of these queues, determining the current number of elements requires a traversal of the elements, and so may report inaccurate results if this collection is modified during traversal. Additionally, the bulk operations addAll, removeAll, retainAll, containsAll, equals, and toArray are not guaranteed to be performed atomically. For example, an iterator operating concurrently with an addAll operation might view only some of the added elements.</p>
-</blockquote>
-<p>意思就是集合类的增删动作与修改集合大小的动作并不是原子的。可能会出现获取到的集合大小与实际的大小不一致的情况。再看看各个BlockingQueue的size实现，部分实现是用了lock进行加锁，保证了size的准确性。</p>
-<table>
-<thead>
-<tr>
-<th>实现类</th>
-<th>size是否加锁</th>
-<th>读写锁</th>
-<th>容量</th>
-<th>存储结构</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>ArrayBlockingQueue</td>
-<td>是</td>
-<td>读写使用同一个锁，读写互斥</td>
-<td>有界</td>
-<td>数组</td>
-</tr>
-<tr>
-<td>DelayQueue</td>
-<td>是</td>
-<td>读写使用同一个锁，读写互斥</td>
-<td>无界</td>
-<td>数组</td>
-</tr>
-<tr>
-<td>LinkedBlockingDeque</td>
-<td>是</td>
-<td>使用UNSAFE的CAS</td>
-<td>可配</td>
-<td>双向链表</td>
-</tr>
-<tr>
-<td>LinkedBlockingQueue</td>
-<td>否</td>
-<td>读写使用不同的锁，可同时读写</td>
-<td>可配</td>
-<td>单向链表</td>
-</tr>
-<tr>
-<td>LinkedTransferQueue</td>
-<td>否</td>
-<td>使用UNSAFE的CAS</td>
-<td>无界</td>
-<td>单向链表</td>
-</tr>
-<tr>
-<td>PriorityBlockingQueue</td>
-<td>是</td>
-<td>使用同一个锁，读写互斥</td>
-<td>自动扩容</td>
-<td>数组</td>
-</tr>
-<tr>
-<td>SynchronousQueue</td>
-<td>直接返回0</td>
-<td>使用UNSAFE的CAS</td>
-<td>无界</td>
-<td>栈或单向链表</td>
-</tr>
-</tbody></table>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/15/BlockingQueue/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -465,31 +368,15 @@
 <li>可选的大括号：如果主体包含了一个语句，就不需要使用大括号。</li>
 <li>可选的返回关键字：如果主体只有一个表达式返回值则编译器会自动返回值，大括号需要指定明表达式返回了一个数值。</li>
 </ul>
-<h2 id="Lambda表达式实例"><a href="#Lambda表达式实例" class="headerlink" title="Lambda表达式实例"></a>Lambda表达式实例</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 不需要参数,返回值为 5  </span></span><br><span class="line">() -&gt; <span class="number">5</span> </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 2. 接收一个参数(数字类型),返回其2倍的值  </span></span><br><span class="line">x -&gt; <span class="number">2</span> * x  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 3. 接受2个参数(数字),并返回他们的差值  </span></span><br><span class="line">(x, y) -&gt; x – y </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 4. 接收2个int型整数,返回他们的和  </span></span><br><span class="line">(<span class="keyword">int</span> x, <span class="keyword">int</span> y) -&gt; x + y  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// 5. 接受一个 string 对象,并在控制台打印,不返回任何值(看起来像是返回void)  </span></span><br><span class="line">(String s) -&gt; System.out.print(s)</span><br><span class="line">  </span><br><span class="line"><span class="comment">// 6. 接受两个string 对象，并在控制台打印，返回两个string的拼接结果</span></span><br><span class="line">(String a, String b) -&gt; &#123;</span><br><span class="line">  System.out.print(a);</span><br><span class="line">  System.out.print(b);</span><br><span class="line">  <span class="keyword">return</span> a.concat(b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>具体的实例可以直接看Java官网提供的实例</p>
-<p>首先创建了一个Person类，所有的Person实例都存放在List<Person> roster 中。</Person></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> Sex &#123;</span><br><span class="line">        MALE, FEMALE</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    String name;</span><br><span class="line">    LocalDate birthday;</span><br><span class="line">    Sex gender;</span><br><span class="line">    String emailAddress;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printPerson</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>然后创建一个方法，可以根据不同的判断条件打印符合条件的Person</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printPersons</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    List&lt;Person&gt; roster, CheckPerson tester)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (Person p : roster) &#123;</span><br><span class="line">        <span class="keyword">if</span> (tester.test(p)) &#123;</span><br><span class="line">            p.printPerson();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>由于支持不用的判断条件，所以将判断条件写成一个接口，自行实现接口就可以实现不用的判断条件。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">CheckPerson</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Person p)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>JAVA8之前的实现如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建一个类去实现判断逻辑</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CheckPersonEligibleForSelectiveService</span> <span class="keyword">implements</span> <span class="title">CheckPerson</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(Person p)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> p.gender == Person.Sex.MALE &amp;&amp;</span><br><span class="line">            p.getAge() &gt;= <span class="number">18</span> &amp;&amp;</span><br><span class="line">            p.getAge() &lt;= <span class="number">25</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//新建实例作为参数传入printPersons</span></span><br><span class="line">printPersons(roster, <span class="keyword">new</span> CheckPersonEligibleForSelectiveService());</span><br></pre></td></tr></table></figure>
-
-<p>JAVA8使用Lambda的实现如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">printPersons(</span><br><span class="line">    roster,</span><br><span class="line">    (Person p) -&gt; p.getGender() == Person.Sex.MALE</span><br><span class="line">        &amp;&amp; p.getAge() &gt;= <span class="number">18</span></span><br><span class="line">        &amp;&amp; p.getAge() &lt;= <span class="number">25</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<p>官网的实例完整源码可查看：</p>
-<p><a href="https://docs.oracle.com/javase/tutorial/java/javaOO/examples/RosterTest.java" target="_blank" rel="noopener">实例完整源码</a></p>
-<h2 id="函数式接口"><a href="#函数式接口" class="headerlink" title="函数式接口"></a>函数式接口</h2><p>Java8中新增了很多函数式接口，了解下，可以使得我们的代码更加简洁，也可以减少重复开发。这里就不详细介绍了，感觉每个接口都能单独写一大篇。直接到以下链接中了解下吧~</p>
-<p><a href="https://www.runoob.com/java/java8-functional-interfaces.html" target="_blank" rel="noopener">Java8函数式接口</a></p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.runoob.com/java/java8-lambda-expressions.html" target="_blank" rel="noopener">Java 8 Lambda 表达式</a></p>
-<p><a href="https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html#approach1" target="_blank" rel="noopener">Lambda Expressions</a></p>
-
+<h2 id="Lambda表达式实例"><a href="#Lambda表达式实例" class="headerlink" title="Lambda表达式实例"></a>Lambda表达式实例</h2>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/13/java8Lambda/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -559,6 +446,14 @@
 
 <p>intellij貌似默认使用maven3，maven3需jdk1.7以上版本才能运行。修改为maven2即可。</p>
 
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2020/01/09/guava/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -628,56 +523,14 @@
 <h4 id="配置SSH-keys"><a href="#配置SSH-keys" class="headerlink" title="配置SSH keys"></a>配置SSH keys</h4><p>首先检查SSH key</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> ~/.ssh</span><br></pre></td></tr></table></figure>
 <p>如果提示：No such file or directory说明第一次使用git，然后执行以下步骤生成新的SSH Key</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C <span class="string">"email@youremail.com"</span></span><br><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file <span class="keyword">in</span> <span class="built_in">which</span> to save the key (/Users/your_user_directory/.ssh/id_rsa):&lt;回车就好&gt;</span><br><span class="line">Enter passphrase (empty <span class="keyword">for</span> no passphrase):&lt;输入加密串&gt;</span><br><span class="line">Enter same passphrase again:&lt;再次输入加密串&gt;</span><br></pre></td></tr></table></figure>
-<p>可以直接按3次回车，也可设置密码。这个密码会在提交项目时使用，如果为空（直接按3次回车则未空）的话提交项目时不用输入。</p>
-<h4 id="向ssh-agent添加key"><a href="#向ssh-agent添加key" class="headerlink" title="向ssh-agent添加key"></a>向ssh-agent添加key</h4><p>首先保证ssh-agent可运行</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-agent -s</span><br></pre></td></tr></table></figure>
-<p>添加SSH key</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-add ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
-<h4 id="添加SSH-key到GitHub"><a href="#添加SSH-key到GitHub" class="headerlink" title="添加SSH key到GitHub"></a>添加SSH key到GitHub</h4><p>在本机设置SSH Key之后，需要添加到GitHub上，以完成SSH链接的设置<br>1.拷贝key</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ clip &lt; ~/.ssh/id_rsa.pub</span><br></pre></td></tr></table></figure>
-<p>2.在GitHub右上方点击头像，选择“Settings”</p>
-<img src="/images/settings.png" class>
-<p>3.在左侧导航中选择“SSH and GPG keys”,然后在右上角点击“New SSH key”</p>
-<img src="/images/newssh.png" class>
-<p>4.将第1步中拷贝出来的key粘贴到“key”中，然后点击“add ssh key”。</p>
-<img src="/images/addssh.png" class>
-<h4 id="设置用户名和邮箱地址"><a href="#设置用户名和邮箱地址" class="headerlink" title="设置用户名和邮箱地址"></a>设置用户名和邮箱地址</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git config --global user.name <span class="string">"username"</span></span><br><span class="line">$ git config --global user.email <span class="string">"username@example.com"</span></span><br></pre></td></tr></table></figure>
-<h3 id="1-3-测试链接"><a href="#1-3-测试链接" class="headerlink" title="1.3 测试链接"></a>1.3 测试链接</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh -T git@github.com</span><br></pre></td></tr></table></figure>
-<p>如果出现以下信息</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">The authenticity of host <span class="string">'github.com (207.97.227.239)'</span> can<span class="string">'t be established.</span></span><br><span class="line"><span class="string">RSA key fingerprint is 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48.</span></span><br><span class="line"><span class="string">Are you sure you want to continue connecting (yes/no)?</span></span><br></pre></td></tr></table></figure>
-<p>就键入：yes。之后就能看到如下信息：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hi username! You<span class="string">'ve successfully authenticated, but GitHub does not</span></span><br><span class="line"><span class="string">provide shell access.</span></span><br></pre></td></tr></table></figure>
-<h2 id="二、创建github仓库"><a href="#二、创建github仓库" class="headerlink" title="二、创建github仓库"></a>二、创建github仓库</h2><h3 id="2-1-在github中创建blog的仓库"><a href="#2-1-在github中创建blog的仓库" class="headerlink" title="2.1 在github中创建blog的仓库"></a>2.1 在github中创建blog的仓库</h3><p>点击github个人主页的右上角的”new repository”创建新的仓库</p>
-<img src="/images/newrepo.png" class>
-<p>在创建页面中只需要填写repository name即可，repository name的格式必须是name.github.io 。这样github pages 才能识别出来。</p>
-<h3 id="2-2-克隆本地仓库"><a href="#2-2-克隆本地仓库" class="headerlink" title="2.2 克隆本地仓库"></a>2.2 克隆本地仓库</h3><p>在github上创建好blog的仓库后可先行科隆到本地，这一步不做也没关系，因为后面的部分操作可能导致此步报废。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git <span class="built_in">clone</span> git@github.com:username/name.github.io.git</span><br></pre></td></tr></table></figure>
-
-<h2 id="三、Hexo"><a href="#三、Hexo" class="headerlink" title="三、Hexo"></a>三、Hexo</h2><p>Hexo的安装过程可以在<a href="https://hexo.io/zh-cn/docs/index.html" target="_blank" rel="noopener" title target>Hexo</a>的官网中找到。</p>
-<h3 id="3-1-Hexo安装前准备"><a href="#3-1-Hexo安装前准备" class="headerlink" title="3.1 Hexo安装前准备"></a>3.1 Hexo安装前准备</h3><p>安装Hexo之前需要确保机器上有npm和Nodejs。高版本的Nodejs中包含了npm，所以直接安装Nodejs即可。<br>Nodejs可直接在<a href="https://nodejs.org/en/" target="_blank" rel="noopener" title target>Nodejs官网</a>下载安装包，根据提示完成安装即可。</p>
-<h3 id="3-2-Hexo安装"><a href="#3-2-Hexo安装" class="headerlink" title="3.2 Hexo安装"></a>3.2 Hexo安装</h3><p>hexo是需要在用户拥有完全控制权的目录下进行安装的，可直接在2.2中克隆出来的仓库路径下进行安装。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo npm install -g hexo</span><br><span class="line">$ hexo init </span><br><span class="line">$ npm install</span><br><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
-<p>查看克隆的目录下是否还存在.git</p>
-<img src="/images/ifgit.png" class>
-<p>若不存在则执行以下命令</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git init</span><br><span class="line">$ git remote add origin git@github.com:username/name.github.io.git</span><br></pre></td></tr></table></figure>
-<p>然后就可以将hexo项目提交到github中管理</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git checkout --orphan hexo</span><br><span class="line">$ git add .</span><br><span class="line">$ git commit -m <span class="string">"first post"</span></span><br><span class="line">$ git push origin hexo</span><br></pre></td></tr></table></figure>
-<h3 id="3-3-配置发布"><a href="#3-3-配置发布" class="headerlink" title="3.3 配置发布"></a>3.3 配置发布</h3><p>在blog的仓库目录下现在会有_config.yml，编辑此文件。<br>默认生成的_config.yml中有这一段</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Deployment</span></span><br><span class="line"><span class="comment">## Docs: http://hexo.io/docs/deployment.html</span></span><br><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>:</span><br></pre></td></tr></table></figure>
-<p>修改后如下</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repo: 对应仓库的SSH地址（可以在GitHub对应的仓库中复制）</span><br><span class="line">  branch: 分支（我使用master分支存放发布后的静态文件，用hexo分支存hexo项目文件）</span><br></pre></td></tr></table></figure>
-<p>PS：配置文件中“:”后面必须有一个空格。<br>修改成功后执行下列指令进行部署</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ hexo g</span><br><span class="line">$ hexo d</span><br></pre></td></tr></table></figure>
-<p>然后访问namme.github.io就可以看到blog了。</p>
-<h2 id="四、参考链接"><a href="#四、参考链接" class="headerlink" title="四、参考链接"></a>四、参考链接</h2><ol>
-<li><a href="http://crazymilk.github.io/2015/12/28/GitHub-Pages-Hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/" target="_blank" rel="noopener" title target>GitHub-Pages-Hexo搭建博客</a></li>
-<li><a href="http://theme-next.iissnan.com/getting-started.html" target="_blank" rel="noopener" title target>NexT主题</a></li>
-<li><a href="http://blog.csdn.net/poem_of_sunshine/article/details/29369785" target="_blank" rel="noopener" title target>如何搭建一个独立博客——简明Github Pages与Hexo教程</a>
-</li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2016/09/15/firstpost/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
