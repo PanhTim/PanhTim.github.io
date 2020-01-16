@@ -227,7 +227,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-01-16 16:32:54" itemprop="dateModified" datetime="2020-01-16T16:32:54+08:00">2020-01-16</time>
+                <time title="Modified: 2020-01-16 16:52:23" itemprop="dateModified" datetime="2020-01-16T16:52:23+08:00">2020-01-16</time>
               </span>
 
           
@@ -328,7 +328,7 @@
 </li>
 </ol>
 <p>​        具体的读写逻辑就先不看了，有机会的话一个一个Queue的源码慢慢看，这里先看个读写的示意图，不过貌似没有transfer的操作说明。</p>
-<p><img src="/Users/panht/Downloads/4236553-d60a5b0368dd8d8c-2.png" alt="4236553-d60a5b0368dd8d8c-2"></p>
+<p><img src="BlockingQueue/LinkedTransferQueue.png" alt="LinkedTransferQueue"></p>
 <p>​        LinkedTransferQueue与其他的BlockingQueue不一样，它没有使用ReentrantLock对读写等操作上锁。这个队列的读写原理以及阻塞原理需要仔细看源码才行，有空再看。</p>
 <p>size无lock，读写貌似均无锁？</p>
 <h2 id="PriorityBlockingQueue"><a href="#PriorityBlockingQueue" class="headerlink" title="PriorityBlockingQueue"></a>PriorityBlockingQueue</h2><p>​        PriorityBlockingQueue与ArrayBlockingQueue一样，内部都是用数组对对象进行存储，在初始化时都可以选择性的指定容量大小，不指定容量时默认使用Integer.MAX_VALUE($2^31$-1)。不同之处在于，PriorityBlockingQueue中的元素存放是有序的，并且当达到容量上限时会自动扩容。扩容规则如下：</p>
