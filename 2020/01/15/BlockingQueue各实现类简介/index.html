@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="BlockingQueue各实现类简介​        BlockingQueue就是定义了一种阻塞队列。BlockingQueue中定义了以下的方法：     Throws exception Special value Blocks Times out    Insert add(e) offer(e) put(e) offer(e, time, unit)   Remove remove()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BlockingQueue各实现类简介">
+<meta property="og:url" content="http://yoursite.com/2020/01/15/BlockingQueue%E5%90%84%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:site_name" content="Tim&#39;s Blog">
+<meta property="og:description" content="BlockingQueue各实现类简介​        BlockingQueue就是定义了一种阻塞队列。BlockingQueue中定义了以下的方法：     Throws exception Special value Blocks Times out    Insert add(e) offer(e) put(e) offer(e, time, unit)   Remove remove()">
+<meta property="og:image" content="http://yoursite.com/Users/panht/Downloads/4236553-d60a5b0368dd8d8c-2.png">
+<meta property="article:published_time" content="2020-01-15T02:18:04.000Z">
+<meta property="article:modified_time" content="2020-01-16T08:32:54.807Z">
+<meta property="article:author" content="Tim">
+<meta property="article:tag" content="-JAVA -BlockingQueue">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/Users/panht/Downloads/4236553-d60a5b0368dd8d8c-2.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/01/15/BlockingQueue%E5%90%84%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%AE%80%E4%BB%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>BlockingQueue各实现类简介 | Tim's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tim's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="Searching..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/15/BlockingQueue%E5%90%84%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%AE%80%E4%BB%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tim">
+      <meta itemprop="description" content="随便写写">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tim's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BlockingQueue各实现类简介
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-01-15 10:18:04" itemprop="dateCreated datePublished" datetime="2020-01-15T10:18:04+08:00">2020-01-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-01-16 16:32:54" itemprop="dateModified" datetime="2020-01-16T16:32:54+08:00">2020-01-16</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="BlockingQueue各实现类简介"><a href="#BlockingQueue各实现类简介" class="headerlink" title="BlockingQueue各实现类简介"></a>BlockingQueue各实现类简介</h1><p>​        BlockingQueue就是定义了一种阻塞队列。BlockingQueue中定义了以下的方法：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Throws exception</th>
+<th>Special value</th>
+<th>Blocks</th>
+<th>Times out</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Insert</td>
+<td>add(e)</td>
+<td>offer(e)</td>
+<td>put(e)</td>
+<td>offer(e, time, unit)</td>
+</tr>
+<tr>
+<td>Remove</td>
+<td>remove()</td>
+<td>poll()</td>
+<td>take()</td>
+<td>poll(time, unit)</td>
+</tr>
+<tr>
+<td>Examine</td>
+<td>element()</td>
+<td>peek()</td>
+<td>not applicable</td>
+<td>not applicable</td>
+</tr>
+</tbody></table>
+<p>​        BlockingQueue不接收Null参数，Insert类型方法当接收到Null的参数时直接抛出NPE。创建Queue时，可以指定queue的容量大小，当不指定容量大小时默认容量为Integer.MAX_VALUE($2^31$-1)。</p>
+<p>​        Examine 的两个方法都是返回队列的第一个元素，但不会从队列中将该元素删除。两者的区别是，当queue为空时，element()会抛出异常，peek()则直接返回null。</p>
+<p>​        更多的说明建议直接查看BlockingQueue源码中的注释。这里就不瞎翻译误导大家了。</p>
+<h2 id="Java-sdk中BlockingQueue的实现类"><a href="#Java-sdk中BlockingQueue的实现类" class="headerlink" title="Java sdk中BlockingQueue的实现类"></a>Java sdk中BlockingQueue的实现类</h2><ol>
+<li><p><a href="#ArrayBlockingQueue">ArrayBlockingQueue</a></p>
+</li>
+<li><p><a href="#DelayQueue">DelayQueue</a></p>
+</li>
+<li><p><a href="#LinkedBlockingDeque">LinkedBlockingDeque</a></p>
+</li>
+<li><p><a href="#LinkedBlockingQueue">LinkedBlockingQueue</a></p>
+</li>
+<li><p><a href="#LinkedTransferQueue">LinkedTransferQueue</a></p>
+</li>
+<li><p><a href="#PriorityBlockingQueue">PriorityBlockingQueue</a></p>
+</li>
+<li><p><a href="#SynchronousQueue">SynchronusQueue</a></p>
+</li>
+</ol>
+<h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h2><p>​        ArrayBlockingQueue是一个有界阻塞队列（FIFO），创建时必须指定容量大小，并且该大小无法修改。ArrayBlockingQueue的读写操作均会阻塞。当队列已满，执行写入操作时，线程将被阻塞直到队列有空余容量才会写入，或达到等待时间返回false。ArrayBlockingQueue内部使用数组来存放元素。</p>
+<p>​        ArrayBlockingQueue的读写都是使用的同一个锁，所以读写操作是互斥的。ArrayBlockingQueue的锁可以在初始化时定义使用公平锁还是非公平锁，默认使用非公平锁。非公平锁的性能相对于公平锁的性能要好一些，但并发的线程足够多时会出现“饥饿”问题。</p>
+<p>​        size有lock，读写是同一个lock</p>
+<h2 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h2><p>​        DelayQueue是一个无界阻塞队列，并且延迟元素可获取的时间——既当元素写入DelayQueue后，需要经过一定时间才能通过Remove或Examine方法获取到。</p>
+<p>​        存入DelayQueue的元素必须实现Delayed接口。Delayed又继承了Comparable接口，所以Delayed有两个方法需要实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//返回该对象的剩余时间，返回值的单位由参数TimeUnit决定</span></span><br><span class="line"><span class="comment">//从DelayQueue中获取元素时，需要调用此方法判断队列中的第一个元素是否已经到期。</span></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="title">getDelay</span><span class="params">(TimeUnit unit)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//DelayQueue在存放时，会调用该方法进行排序，保证队列的第一个元素是最早到期的元素。</span></span><br><span class="line"><span class="comment">//所以在实现该方法时，需要注意要按照到期的剩余时间升序排序。</span></span><br><span class="line"><span class="comment">//PS：DelayQueue存放元素时，是使用了PriorityBlockingDeque，是PriorityBlockingDeque需要使用到该方法进行排序。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(T o)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>​        DelayQueue虽然实现了offer(E e, long timeout, TimeUnit unit)，但是实际上调用的还是offer(E e)。由于DelayQueue是无界的，乐观的认为不会发生阻塞的情况。</p>
+<p>​        思考：DelayQueue使用的是非公平锁，当并发线程足够多时，应该还是会出现某些线程长时间无法获取到锁的“饥饿”问题。</p>
+<p>​        offer(E e, long timeout, TimeUnit unit)源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Inserts the specified element into this delay queue. As the queue is</span></span><br><span class="line"><span class="comment">* unbounded this method will never block.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> e the element to add</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> timeout This parameter is ignored as the method never blocks</span></span><br><span class="line"><span class="comment">* <span class="doctag">@param</span> unit This parameter is ignored as the method never blocks</span></span><br><span class="line"><span class="comment">* <span class="doctag">@return</span> &#123;<span class="doctag">@code</span> true&#125;</span></span><br><span class="line"><span class="comment">* <span class="doctag">@throws</span> NullPointerException &#123;<span class="doctag">@inheritDoc</span>&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">offer</span><span class="params">(E e, <span class="keyword">long</span> timeout, TimeUnit unit)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> offer(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        size有lock，读写用同一个lock</p>
+<h2 id="LinkedBlockingDeque"><a href="#LinkedBlockingDeque" class="headerlink" title="LinkedBlockingDeque"></a>LinkedBlockingDeque</h2><p>​        LinkedBlockingDeque是双向阻塞队列，容量大小在初始化时指定，若初始化时不指定容量大小则默认容量为Integer.MAX_VALUE($2^31$-1)。内部存储元素是使用双向链表进行存储，链表的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * The item, or null if this node has been removed.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    E item;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * One of:</span></span><br><span class="line"><span class="comment">    * - the real predecessor Node</span></span><br><span class="line"><span class="comment">    * - this Node, meaning the predecessor is tail</span></span><br><span class="line"><span class="comment">    * - null, meaning there is no predecessor</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    Node&lt;E&gt; prev;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * One of:</span></span><br><span class="line"><span class="comment">    * - the real successor Node</span></span><br><span class="line"><span class="comment">    * - this Node, meaning the successor is head</span></span><br><span class="line"><span class="comment">    * - null, meaning there is no successor</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    Node&lt;E&gt; next;</span><br><span class="line"></span><br><span class="line">    Node(E x) &#123;</span><br><span class="line">        item = x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        相比其他的阻塞队列，LinkedBlockingDeque对所有的读写方法都增加了指明读写方向的方法，如：addFirst，addLast，removeFirst，removeLast … …方法后缀带有First表示对队列的第一个元素进行操作，方法后缀带有Last的表示对队列的最后一个元素进行操作。若直接使用BlockingQueue定义的接口，则表示跟FIFO的队列一样的操作——既Insert Last，Remove or Examine First。</p>
+<p>​        LinkedBlockingDeque全局使用同一个锁对象，所以读写操作是互斥的。BlockingDeque这种双向链表实现的阻塞队列主要是用于”工作窃取算法“，以后有机会用到再详细说明。</p>
+<p>​        size有lock</p>
+<h2 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h2><p>​        LinkedBlockingQueue是容量大小可配的阻塞队列，当初始化不指定容量大小时，默认容量为Integer.MAX_VALUE($2^31$-1)。LinkedBlocking内部存储使用单向链表，链表的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">E</span>&gt; </span>&#123;</span><br><span class="line">    E item;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * One of:</span></span><br><span class="line"><span class="comment">    * - the real successor Node</span></span><br><span class="line"><span class="comment">    * - this Node, meaning the successor is head.next</span></span><br><span class="line"><span class="comment">    * - null, meaning there is no successor (this is the last node)</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    Node&lt;E&gt; next;</span><br><span class="line"></span><br><span class="line">    Node(E x) &#123; item = x; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        这里可以和LinkedBlockingDeque的链表定义对比着看。LinkedBlockingQueue中读写的锁是分开的，所以读写操作可以同时进行。</p>
+<p>​        size无lock，读写锁分开</p>
+<h2 id="LinkedTransferQueue"><a href="#LinkedTransferQueue" class="headerlink" title="LinkedTransferQueue"></a>LinkedTransferQueue</h2><p>​        LinkedTransferQueue是FIFO的无界单向阻塞队列，内部存储使用单向链表，但是它的链表结构较为特别，有两种节点类型（数据节点与请求节点）。链表的定义如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">      <span class="keyword">final</span> <span class="keyword">boolean</span> isData;   <span class="comment">// false if this is a request node</span></span><br><span class="line">      <span class="keyword">volatile</span> Object item;   <span class="comment">// initially non-null if isData; CASed to match</span></span><br><span class="line">      <span class="keyword">volatile</span> Node next;</span><br><span class="line">      <span class="keyword">volatile</span> Thread waiter; <span class="comment">// null until waiting</span></span><br><span class="line"></span><br><span class="line">      <span class="comment">//... 中间的一些方法就先不看了，以后有机会再详细的看一下。</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">3375979862319811754L</span>;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Unsafe mechanics</span></span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> sun.misc.Unsafe UNSAFE;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> itemOffset;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> nextOffset;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> waiterOffset;</span><br><span class="line">      <span class="keyword">static</span> &#123;</span><br><span class="line">          <span class="keyword">try</span> &#123;</span><br><span class="line">              UNSAFE = sun.misc.Unsafe.getUnsafe();</span><br><span class="line">              Class&lt;?&gt; k = Node<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">              itemOffset = UNSAFE.objectFieldOffset</span><br><span class="line">                  (k.getDeclaredField(<span class="string">"item"</span>));</span><br><span class="line">              nextOffset = UNSAFE.objectFieldOffset</span><br><span class="line">                  (k.getDeclaredField(<span class="string">"next"</span>));</span><br><span class="line">              waiterOffset = UNSAFE.objectFieldOffset</span><br><span class="line">                  (k.getDeclaredField(<span class="string">"waiter"</span>));</span><br><span class="line">          &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">              <span class="keyword">throw</span> <span class="keyword">new</span> Error(e);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>​        LinkedTransferQueue相比其他的BlockingQueue主要是多了transfer和tryTransfer方法。主要是提供了以下两种操作：</p>
+<ol>
+<li><p>当队列为空或第一个节点为请求节点时，消费者的请求将会生成一个请求节点追加到队列末尾，等待生产者提写入元素</p>
+</li>
+<li><p>当生产者调用transfer接口时，若此时队列的第一个节点是请求节点，生产者将直接把元素传递给消费者，不会再写入队列中；若此时队列为空生产者将元素写入队列，并且阻塞等待消费者消费。</p>
+</li>
+</ol>
+<p>​        具体的读写逻辑就先不看了，有机会的话一个一个Queue的源码慢慢看，这里先看个读写的示意图，不过貌似没有transfer的操作说明。</p>
+<p><img src="/Users/panht/Downloads/4236553-d60a5b0368dd8d8c-2.png" alt="4236553-d60a5b0368dd8d8c-2"></p>
+<p>​        LinkedTransferQueue与其他的BlockingQueue不一样，它没有使用ReentrantLock对读写等操作上锁。这个队列的读写原理以及阻塞原理需要仔细看源码才行，有空再看。</p>
+<p>size无lock，读写貌似均无锁？</p>
+<h2 id="PriorityBlockingQueue"><a href="#PriorityBlockingQueue" class="headerlink" title="PriorityBlockingQueue"></a>PriorityBlockingQueue</h2><p>​        PriorityBlockingQueue与ArrayBlockingQueue一样，内部都是用数组对对象进行存储，在初始化时都可以选择性的指定容量大小，不指定容量时默认使用Integer.MAX_VALUE($2^31$-1)。不同之处在于，PriorityBlockingQueue中的元素存放是有序的，并且当达到容量上限时会自动扩容。扩容规则如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_ARRAY_SIZE = Integer.MAX_VALUE - <span class="number">8</span>;</span><br><span class="line"><span class="keyword">int</span> newCap = oldCap + ((oldCap &lt; <span class="number">64</span>) ?</span><br><span class="line">                                       (oldCap + <span class="number">2</span>) : <span class="comment">// grow faster if small</span></span><br><span class="line">                                       (oldCap &gt;&gt; <span class="number">1</span>));</span><br><span class="line"><span class="keyword">if</span> (newCap - MAX_ARRAY_SIZE &gt; <span class="number">0</span>) &#123;    <span class="comment">// possible overflow</span></span><br><span class="line">  <span class="keyword">int</span> minCap = oldCap + <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (minCap &lt; <span class="number">0</span> || minCap &gt; MAX_ARRAY_SIZE)</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> OutOfMemoryError();</span><br><span class="line">  newCap = MAX_ARRAY_SIZE;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (newCap &gt; oldCap &amp;&amp; queue == array)</span><br><span class="line">  newArray = <span class="keyword">new</span> Object[newCap];</span><br></pre></td></tr></table></figure>
+
+<p>当原队列大小小于64，则容量翻倍后再加2。若原队列大小大于64，则增加原容量的一半。中间的一段是在判断是否超出了最大容量。</p>
+<p>​        PriorityBlockingQueue初始化时允许传入Comparator，若不初始化Comparator，则存入该队列的元素必须实现Comparator的compareTo方法。</p>
+<p>​        size有lock，读写使用同一个lock</p>
+<h2 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h2><p>​        SynchronousQueue是一个无界阻塞队列。元素可以用两个数据结构来存放TransferQueue(FIFO)和TransferStack(LIFO)。Insert操作将被直接阻塞，直到被Remove操作取走元素或达到超时时间。Remove操作也是直接阻塞，直到有Insert操作取走Insert的元素或达到超时时间。</p>
+<p>​        该队列的size方法直接返回0，并且peek方法直接返回null。该队列跟LinkedTransferQueue一样没有使用ReentrantLock。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JAVA-BlockingQueue/" rel="tag"># -JAVA -BlockingQueue</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/13/java8Lambda/" rel="prev" title="JAVA8 Lambda表达式">
+      <i class="fa fa-chevron-left"></i> JAVA8 Lambda表达式
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BlockingQueue各实现类简介"><span class="nav-number">1.</span> <span class="nav-text">BlockingQueue各实现类简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-sdk中BlockingQueue的实现类"><span class="nav-number">1.1.</span> <span class="nav-text">Java sdk中BlockingQueue的实现类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ArrayBlockingQueue"><span class="nav-number">1.2.</span> <span class="nav-text">ArrayBlockingQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DelayQueue"><span class="nav-number">1.3.</span> <span class="nav-text">DelayQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LinkedBlockingDeque"><span class="nav-number">1.4.</span> <span class="nav-text">LinkedBlockingDeque</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LinkedBlockingQueue"><span class="nav-number">1.5.</span> <span class="nav-text">LinkedBlockingQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LinkedTransferQueue"><span class="nav-number">1.6.</span> <span class="nav-text">LinkedTransferQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PriorityBlockingQueue"><span class="nav-number">1.7.</span> <span class="nav-text">PriorityBlockingQueue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SynchronousQueue"><span class="nav-number">1.8.</span> <span class="nav-text">SynchronousQueue</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tim</p>
+  <div class="site-description" itemprop="description">随便写写</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tim</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
